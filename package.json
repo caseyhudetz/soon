@@ -1,0 +1,19 @@
+{
+  "name": "soon",
+  "scripts": {
+    "dev": "wrangler pages dev",
+    "deploy": "wrangler pages deploy"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/caseyhudetz/soon.git"
+  },
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.124.0"
+  },
+  "devDependencies": {
+    "wrangler": "^4.130.0"
+  }
+}

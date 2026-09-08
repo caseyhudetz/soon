@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0A0C10" />
+<meta name="color-scheme" content="dark" />
+<title>Soon</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0C10;
+  --surface:#12151C;
+  --raised:#1A1E28;
+  --line:rgba(255,255,255,.09);
+  --line-soft:rgba(255,255,255,.05);
+  --text:#F2EFE9;
+  --dim:#9AA1B2;
+  --faint:#666E80;
+  --accent:#F5B841;
+  --accent-ink:#1A1206;
+  --accent-soft:rgba(245,184,65,.14);
+  --good:#7FBF6B;
+
+  --pad:20px;
+  --r-sm:10px; --r-md:14px; --r-lg:20px; --r-xl:26px;
+
+  --ease:cubic-bezier(.32,.72,0,1);
+  --fast:180ms;
+  --med:340ms;
+
+  --safe-t:env(safe-area-inset-top,0px);
+  --safe-b:env(safe-area-inset-bottom,0px);
+}
+
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+/* Author rules beat the UA's [hidden]{display:none}, so any class here that sets
+   display would defeat el.hidden. Keep this above everything that does. */
+[hidden]{display:none !important}
+html,body{height:100%;margin:0}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+  font-size:15px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  overscroll-behavior-y:none;
+}
+#app{position:relative;max-width:540px;margin:0 auto;height:100dvh;overflow:hidden;background:var(--bg)}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;padding:0}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:8px}
+svg{display:block;flex:none}
+.icon{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+
+.display{font-family:'Bricolage Grotesque',Inter,sans-serif;font-weight:700;letter-spacing:-.032em;line-height:1.04}
+.eyebrow{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- screens ---------- */
+.screen{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+  background:var(--bg);
+  opacity:0;visibility:hidden;transform:translateY(10px) scale(.995);
+  transition:opacity var(--med) var(--ease),transform var(--med) var(--ease),visibility 0s linear var(--med);
+}
+.screen.on{opacity:1;visibility:visible;transform:none;transition-delay:0s,0s,0s}
+
+/* ---------- glass control ---------- */
+.glass{
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(10,12,16,.42);backdrop-filter:blur(16px) saturate(1.4);
+  -webkit-backdrop-filter:blur(16px) saturate(1.4);
+  border:1px solid rgba(255,255,255,.13);
+  color:var(--text);
+  transition:transform var(--fast) var(--ease),background var(--fast) ease;
+}
+.glass:active{transform:scale(.93)}
+.glass-round{width:42px;height:42px;border-radius:50%}
+
+/* ---------- home / viewfinder ---------- */
+#s-home{background:#000;overflow:hidden}
+#live{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000}
+.scrim{position:absolute;inset:0;pointer-events:none;z-index:1;
+  background:
+    linear-gradient(to bottom,rgba(6,8,12,.7),transparent 20%),
+    linear-gradient(to top,rgba(6,8,12,.85),transparent 34%);
+}
+.flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:6}
+.flash.go{animation:flash .32s ease-out}
+@keyframes flash{0%{opacity:.85}100%{opacity:0}}
+
+.camera-ui{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;min-height:0}
+
+.cam-top{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:calc(var(--safe-t) + 12px) var(--pad) 0;
+}
+.wordmark{font-family:'Bricolage Grotesque',Inter,sans-serif;font-weight:700;font-size:21px;
+  letter-spacing:-.045em;text-shadow:0 1px 14px rgba(0,0,0,.55)}
+.wordmark i{font-style:normal;color:var(--accent)}
+.count-dot{position:absolute;top:-3px;right:-3px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;
+  background:var(--accent);color:var(--accent-ink);font-size:10px;font-weight:600;line-height:16px;text-align:center}
+.has-count{position:relative}
+
+.cam-bottom{margin-top:auto;padding:0 var(--pad) calc(var(--safe-b) + 26px)}
+.hint{
+  text-align:center;margin:0 0 22px;font-size:13.5px;line-height:1.5;
+  color:rgba(242,239,233,.78);text-shadow:0 1px 12px rgba(0,0,0,.7);
+}
+.controls{display:grid;grid-template-columns:1fr auto 1fr;align-items:center}
+.controls .glass-round{justify-self:center}
+.controls .glass-round:first-child{justify-self:start}
+.controls .glass-round:last-child{justify-self:end}
+
+.shutter{
+  width:74px;height:74px;border-radius:50%;justify-self:center;
+  border:3px solid rgba(255,255,255,.9);
+  background:transparent;padding:4px;
+  transition:transform var(--fast) var(--ease);
+}
+.shutter span{display:block;width:100%;height:100%;border-radius:50%;background:var(--accent);
+  transition:transform var(--fast) var(--ease),background var(--fast) ease}
+.shutter:active{transform:scale(.95)}
+.shutter:active span{transform:scale(.88)}
+.shutter[disabled]{opacity:.45}
+.shutter[disabled] span{background:rgba(255,255,255,.6)}
+
+/* camera unavailable */
+.cam-off{position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;
+  padding:40px var(--pad) calc(var(--safe-b) + 40px);background:var(--bg)}
+.cam-off::after{content:"";position:absolute;left:50%;bottom:-14%;transform:translateX(-50%);
+  width:150%;height:56%;pointer-events:none;
+  background:radial-gradient(ellipse at 50% 100%,rgba(245,184,65,.22),rgba(245,184,65,.03) 48%,transparent 72%)}
+.cam-off > *{position:relative;z-index:1}
+.spark{width:7px;height:7px;border-radius:50%;background:var(--accent);margin-bottom:26px;
+  box-shadow:0 0 0 6px rgba(245,184,65,.12),0 0 28px 8px rgba(245,184,65,.45);
+  animation:breathe 4.5s ease-in-out infinite}
+@keyframes breathe{0%,100%{opacity:.55;transform:scale(.85)}50%{opacity:1;transform:scale(1.15)}}
+.cam-off h1{font-size:clamp(30px,8.5vw,38px);margin:0 0 14px}
+.cam-off p{color:var(--dim);font-size:14.5px;line-height:1.55;max-width:28ch;margin:0 0 28px}
+
+/* ---------- buttons ---------- */
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  width:100%;padding:16px;border-radius:var(--r-md);
+  font-size:15px;font-weight:600;
+  transition:transform var(--fast) var(--ease),background var(--fast) ease,opacity var(--fast) ease;
+}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--accent);color:var(--accent-ink)}
+.btn-ghost{background:var(--raised);border:1px solid var(--line);color:var(--text);font-weight:500}
+.btn-row{display:flex;gap:10px}
+.btn-row .btn{flex:1}
+.btn-sm{padding:13px;font-size:14px}
+
+/* ---------- working ---------- */
+#s-work{background:#000}
+.work-shot{position:absolute;inset:0}
+.work-shot img{width:100%;height:100%;object-fit:cover;filter:saturate(.7) brightness(.55)}
+.work-sweep{position:absolute;inset:0;
+  background:linear-gradient(105deg,transparent 40%,rgba(245,184,65,.10) 50%,transparent 60%);
+  background-size:260% 100%;animation:sweep 2.4s linear infinite}
+@keyframes sweep{0%{background-position:130% 0}100%{background-position:-30% 0}}
+.work-ui{position:relative;z-index:2;margin-top:auto;
+  padding:0 var(--pad) calc(var(--safe-b) + 44px);text-align:center}
+.work-line{font-family:'Bricolage Grotesque',Inter,sans-serif;font-weight:600;font-size:21px;
+  letter-spacing:-.025em;margin:0 0 20px;min-height:2.1em;
+  display:flex;align-items:flex-end;justify-content:center;
+  transition:opacity var(--fast) ease}
+.work-line.fade{opacity:0}
+.track{height:2px;border-radius:2px;background:rgba(255,255,255,.14);overflow:hidden}
+.track::after{content:"";display:block;height:100%;width:38%;border-radius:2px;background:var(--accent);
+  animation:track 1.7s var(--ease) infinite}
+@keyframes track{0%{transform:translateX(-110%)}100%{transform:translateX(300%)}}
+
+/* ---------- result: sticky hero + sheet ---------- */
+.hero{position:sticky;top:0;height:58vh;min-height:280px;flex:none;overflow:hidden;background:var(--surface);z-index:0}
+.hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.hero .orig{opacity:0;transition:opacity var(--fast) ease;z-index:2}
+.hero.compare .orig{opacity:1}
+.hero-scrim{position:absolute;inset:0;z-index:3;pointer-events:none;
+  background:linear-gradient(to bottom,rgba(6,8,12,.55),transparent 22%,transparent 62%,rgba(10,12,16,.5))}
+.developing{position:absolute;inset:0;z-index:4;
+  background:linear-gradient(105deg,transparent 40%,rgba(245,184,65,.16) 50%,transparent 60%);
+  background-size:260% 100%;animation:sweep 2s linear infinite}
+.hero-close{position:absolute;top:calc(var(--safe-t) + 12px);right:var(--pad);z-index:6}
+.pin{position:absolute;top:calc(var(--safe-t) + 14px);left:var(--pad);z-index:6;
+  display:flex;align-items:center;gap:6px;padding:7px 11px;border-radius:20px;
+  font-size:11.5px;color:rgba(242,239,233,.9)}
+.pin .icon{width:13px;height:13px}
+.peek{position:absolute;bottom:34px;right:var(--pad);z-index:6;
+  display:flex;align-items:center;gap:7px;padding:9px 14px;border-radius:22px;
+  font-size:12px;font-weight:500;user-select:none;-webkit-user-select:none}
+.peek .icon{width:14px;height:14px}
+
+.sheet{
+  position:relative;z-index:5;flex:1;
+  margin-top:-26px;
+  background:var(--bg);
+  border-radius:var(--r-xl) var(--r-xl) 0 0;
+  box-shadow:0 -18px 44px rgba(0,0,0,.5);
+  padding:0 var(--pad) calc(var(--safe-b) + 40px);
+}
+.grabber{width:38px;height:4px;border-radius:2px;background:rgba(255,255,255,.18);margin:11px auto 20px}
+
+.chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:16px}
+.chip{font-size:11.5px;font-weight:500;padding:6px 11px;border-radius:20px;
+  background:var(--raised);border:1px solid var(--line-soft);color:var(--dim)}
+.chip.accent{background:var(--accent-soft);border-color:rgba(245,184,65,.24);color:var(--accent)}
+
+.sheet h1{font-size:clamp(29px,7.8vw,36px);margin:0 0 12px}
+.lede{font-size:16.5px;line-height:1.5;margin:0 0 26px;color:rgba(242,239,233,.92)}
+
+.card{padding:18px;border-radius:var(--r-lg);background:var(--surface);border:1px solid var(--line-soft);margin-bottom:26px}
+.card .eyebrow{display:block;margin-bottom:10px;color:var(--accent)}
+.card p{margin:0;font-size:14px;line-height:1.6;color:rgba(242,239,233,.88)}
+.card .plan{margin-top:14px;padding-top:14px;border-top:1px solid var(--line-soft);
+  font-size:13px;line-height:1.55;color:var(--dim)}
+.card .plan b{color:var(--text);font-weight:600;display:block;margin-bottom:2px;font-size:11px;
+  letter-spacing:.08em;text-transform:uppercase}
+
+.section-label{display:block;margin-bottom:14px}
+.steps{margin:0 0 26px;padding:0;list-style:none}
+.steps li{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--line-soft)}
+.steps li:first-of-type{border-top:1px solid var(--line-soft)}
+.num{flex:none;width:24px;height:24px;border-radius:50%;margin-top:1px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11.5px;font-weight:600;
+  background:var(--accent-soft);color:var(--accent)}
+.num.owner{background:var(--raised);color:var(--dim)}
+.num .icon{width:13px;height:13px}
+.steps b{display:block;font-size:14.5px;font-weight:500;line-height:1.4}
+.steps span{display:block;font-size:13px;color:var(--dim);margin-top:3px;line-height:1.45}
+
+.links{display:flex;gap:8px;margin-bottom:26px;flex-wrap:wrap}
+.links a{display:flex;align-items:center;gap:6px;font-size:13px;padding:10px 14px;border-radius:20px;
+  border:1px solid var(--line);background:var(--surface);text-decoration:none;color:var(--text)}
+.links .icon{width:13px;height:13px;color:var(--dim)}
+
+.note{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);
+  color:var(--text);padding:14px;font:inherit;font-size:14px;resize:vertical;min-height:76px;margin-bottom:14px}
+.note::placeholder{color:var(--faint)}
+
+.err{margin:0 0 20px;padding:16px;border-radius:var(--r-md);
+  background:var(--surface);border:1px solid var(--line);font-size:13.5px;line-height:1.55;color:var(--dim)}
+.err b{display:block;margin-bottom:4px;color:var(--text);font-size:14.5px;font-weight:600}
+
+/* ---------- null case ---------- */
+.null-body{padding:32px var(--pad) 0;text-align:center}
+.null-dot{width:8px;height:8px;border-radius:50%;background:var(--good);margin:0 auto 22px;
+  box-shadow:0 0 0 6px rgba(127,191,107,.12)}
+.null-body h1{font-size:clamp(26px,7vw,32px);margin:0 0 12px}
+.null-body p{color:var(--dim);font-size:15px;line-height:1.55;max-width:30ch;margin:0 auto}
+
+/* ---------- page header (saved / about) ---------- */
+.page-head{display:flex;align-items:center;gap:14px;padding:calc(var(--safe-t) + 14px) var(--pad) 22px}
+.page-head h2{font-size:24px;margin:0;font-family:'Bricolage Grotesque',Inter,sans-serif;
+  font-weight:700;letter-spacing:-.03em}
+.back-btn{width:38px;height:38px;border-radius:50%;background:var(--raised);border:1px solid var(--line-soft);
+  display:flex;align-items:center;justify-content:center;flex:none;
+  transition:transform var(--fast) var(--ease)}
+.back-btn:active{transform:scale(.93)}
+.page-body{padding:0 var(--pad) calc(var(--safe-b) + 40px)}
+
+/* ---------- saved ---------- */
+.saved-sub{color:var(--dim);font-size:13px;margin:-10px 0 20px}
+.saved-card{display:flex;gap:13px;align-items:center;width:100%;text-align:left;
+  padding:11px;border-radius:var(--r-md);margin-bottom:8px;
+  background:var(--surface);border:1px solid var(--line-soft);
+  transition:transform var(--fast) var(--ease),background var(--fast) ease}
+.saved-card:active{transform:scale(.985);background:var(--raised)}
+.saved-card img{width:58px;height:70px;object-fit:cover;border-radius:var(--r-sm);flex:none;background:var(--raised)}
+.saved-card .meta{flex:1;min-width:0}
+.saved-card b{display:block;font-family:'Bricolage Grotesque',Inter,sans-serif;font-weight:600;
+  font-size:16px;letter-spacing:-.02em;line-height:1.25}
+.saved-card span{display:block;font-size:12.5px;color:var(--dim);margin-top:4px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.saved-card .icon{color:var(--faint);width:16px;height:16px}
+
+.empty{text-align:center;padding:56px 20px}
+.empty .icon{width:26px;height:26px;color:var(--faint);margin:0 auto 16px}
+.empty p{color:var(--dim);font-size:14.5px;line-height:1.6;max-width:26ch;margin:0 auto}
+
+/* ---------- about ---------- */
+.about p{color:var(--dim);font-size:14.5px;line-height:1.65;margin:0 0 16px}
+.about h3{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--faint);margin:30px 0 12px}
+.status-row{display:flex;align-items:center;gap:11px;padding:14px 16px;border-radius:var(--r-md);
+  background:var(--surface);border:1px solid var(--line-soft);margin-bottom:8px;font-size:14px}
+.status-row .dot{width:7px;height:7px;border-radius:50%;background:var(--faint);flex:none}
+.status-row.ok .dot{background:var(--good);box-shadow:0 0 0 4px rgba(127,191,107,.14)}
+.status-row.off .dot{background:var(--faint)}
+.status-row .what{flex:1}
+.status-row .state{color:var(--dim);font-size:13px}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.001ms !important;animation-iteration-count:1 !important;
+    transition-duration:.001ms !important}
+}
+</style>
+</head>
+<body>
+
+<svg class="sr" aria-hidden="true"><defs>
+  <symbol id="i-images" viewBox="0 0 24 24"><rect x="3" y="3" width="13" height="13" rx="2.5"/><path d="M8 20h10a3 3 0 0 0 3-3V8"/><circle cx="7.5" cy="7.5" r="1.4"/><path d="m3 13 3.6-3.2a2 2 0 0 1 2.7.05L16 16"/></symbol>
+  <symbol id="i-flip" viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 1-13.7 5.6L4 15.4"/><path d="M4 12a8 8 0 0 1 13.7-5.6L20 8.6"/><path d="M4 20v-4.6h4.6M20 4v4.6h-4.6"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 3 8.5 4.6L12 12.2 3.5 7.6 12 3Z"/><path d="m3.5 12.2 8.5 4.6 8.5-4.6"/><path d="m3.5 16.6 8.5 4.6 8.5-4.6"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><circle cx="12" cy="7.8" r=".9" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5.5 8.5 12l6.5 6.5"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9.5 5.5 6.5 6.5-6.5 6.5"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M19 10.4c0 5-7 11.1-7 11.1s-7-6.1-7-11.1a7 7 0 1 1 14 0Z"/><circle cx="12" cy="10.2" r="2.6"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12S6.5 5.5 12 5.5 21.5 12 21.5 12 17.5 18.5 12 18.5 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="3.2"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 15.5V3.5"/><path d="m7.8 7.7 4.2-4.2 4.2 4.2"/><path d="M5.5 13v6a1.5 1.5 0 0 0 1.5 1.5h10a1.5 1.5 0 0 0 1.5-1.5v-6"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4.5 6.5h15M9.5 6.5V5a1.5 1.5 0 0 1 1.5-1.5h2A1.5 1.5 0 0 1 14.5 5v1.5"/><path d="M6.5 6.5 7.4 19a1.5 1.5 0 0 0 1.5 1.4h6.2a1.5 1.5 0 0 0 1.5-1.4l.9-12.5"/></symbol>
+  <symbol id="i-bookmark" viewBox="0 0 24 24"><path d="M6.5 4.5h11a1 1 0 0 1 1 1v15l-6.5-4-6.5 4v-15a1 1 0 0 1 1-1Z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13.8a3.6 3.6 0 0 0 5.3.4l2.6-2.6a3.6 3.6 0 0 0-5.1-5.1l-1.5 1.5"/><path d="M14 10.2a3.6 3.6 0 0 0-5.3-.4l-2.6 2.6a3.6 3.6 0 0 0 5.1 5.1l1.5-1.5"/></symbol>
+  <symbol id="i-owner" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3"/></symbol>
+</defs></svg>
+
+<div id="app">
+
+<!-- ============ HOME / VIEWFINDER ============ -->
+<section class="screen on" id="s-home">
+  <video id="live" playsinline muted autoplay></video>
+  <div class="scrim"></div>
+  <div class="flash" id="flash"></div>
+
+  <div class="camera-ui" id="cameraUI">
+    <header class="cam-top">
+      <button class="glass glass-round has-count" id="toSaved" aria-label="Saved ideas">
+        <svg class="icon"><use href="#i-layers"/></svg>
+        <span class="count-dot" id="savedCount" hidden></span>
+      </button>
+      <div class="wordmark">Soon<i>.</i></div>
+      <button class="glass glass-round" id="toAbout" aria-label="About Soon">
+        <svg class="icon"><use href="#i-info"/></svg>
+      </button>
+    </header>
+
+    <div class="cam-bottom">
+      <p class="hint">Point at a spot on your block.<br>An alley, a blank wall, a dead corner.</p>
+      <div class="controls">
+        <button class="glass glass-round" id="rollBtn" aria-label="Choose from library">
+          <svg class="icon"><use href="#i-images"/></svg>
+        </button>
+        <button class="shutter" id="trigger" aria-label="Take photo"><span></span></button>
+        <button class="glass glass-round" id="flipBtn" aria-label="Switch camera">
+          <svg class="icon"><use href="#i-flip"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="cam-off" id="camOff" hidden>
+    <div class="spark"></div>
+    <h1 class="display">What could<br>this corner be?</h1>
+    <p id="camOffWhy">Point at a spot on your block. An alley, a blank wall, a dead corner.</p>
+    <button class="btn btn-primary" id="pickPhoto" style="max-width:300px">
+      <svg class="icon"><use href="#i-images"/></svg>Choose a photo
+    </button>
+    <div style="display:flex;gap:8px;margin-top:22px">
+      <button class="btn btn-ghost btn-sm" id="toSaved2" style="width:auto;padding-inline:18px">Saved</button>
+      <button class="btn btn-ghost btn-sm" id="toAbout2" style="width:auto;padding-inline:18px">About</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WORKING ============ -->
+<section class="screen" id="s-work">
+  <div class="work-shot">
+    <img id="workImg" alt="" />
+    <div class="work-sweep"></div>
+  </div>
+  <div class="work-ui">
+    <p class="work-line" id="workLine">Reading the block</p>
+    <div class="track"></div>
+  </div>
+</section>
+
+<!-- ============ RESULT ============ -->
+<section class="screen" id="s-result">
+  <div class="hero" id="hero">
+    <img id="renderImg" alt="This spot, imagined" />
+    <img id="origImg" class="orig" alt="This spot now" />
+    <div class="hero-scrim"></div>
+    <div class="developing" id="developing" hidden></div>
+    <div class="pin glass" id="pinBadge" hidden>
+      <svg class="icon"><use href="#i-pin"/></svg><span id="pinText"></span>
+    </div>
+    <button class="glass glass-round hero-close" id="closeResult" aria-label="Close">
+      <svg class="icon"><use href="#i-close"/></svg>
+    </button>
+    <button class="peek glass" id="peek">
+      <svg class="icon"><use href="#i-eye"/></svg><span id="peekLabel">Hold to compare</span>
+    </button>
+  </div>
+
+  <div class="sheet">
+    <div class="grabber"></div>
+    <div id="errSlot"></div>
+    <div class="chips">
+      <span class="chip" id="chipSite" hidden></span>
+      <span class="chip accent" id="chipPattern" hidden></span>
+    </div>
+    <h1 class="display" id="rName"></h1>
+    <p class="lede" id="rLede"></p>
+
+    <div class="card" id="whyCard">
+      <span class="eyebrow">Why this works</span>
+      <p id="rWhy"></p>
+      <div class="plan" id="rPlan" hidden></div>
+    </div>
+
+    <span class="eyebrow section-label">To make it real</span>
+    <ul class="steps" id="rSteps"></ul>
+
+    <div class="links">
+      <a href="https://311.chicago.gov" target="_blank" rel="noopener">
+        <svg class="icon"><use href="#i-link"/></svg>Chicago 311</a>
+      <a href="https://www.44thward.org" target="_blank" rel="noopener">
+        <svg class="icon"><use href="#i-link"/></svg>44th Ward office</a>
+    </div>
+
+    <textarea class="note" id="rNote" placeholder="Why does this matter to you? (optional)"></textarea>
+
+    <button class="btn btn-primary" id="saveBtn">
+      <svg class="icon"><use href="#i-bookmark"/></svg><span id="saveLabel">Save this idea</span>
+    </button>
+    <div class="btn-row" style="margin-top:10px">
+      <button class="btn btn-ghost btn-sm" id="shareBtn">
+        <svg class="icon"><use href="#i-share"/></svg><span id="shareLabel">Share</span>
+      </button>
+      <button class="btn btn-ghost btn-sm" id="discardBtn">
+        <svg class="icon"><use href="#i-trash"/></svg>Discard
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ NULL CASE ============ -->
+<section class="screen" id="s-null">
+  <div class="hero" style="height:44vh">
+    <img id="nullImg" alt="The spot you photographed" />
+    <div class="hero-scrim"></div>
+    <button class="glass glass-round hero-close" id="closeNull" aria-label="Close">
+      <svg class="icon"><use href="#i-close"/></svg>
+    </button>
+  </div>
+  <div class="sheet">
+    <div class="grabber"></div>
+    <div class="null-body">
+      <div class="null-dot"></div>
+      <h1 class="display">This corner is already<br>doing its job.</h1>
+      <p id="nullWhy"></p>
+    </div>
+    <div style="margin-top:32px">
+      <button class="btn btn-ghost" id="nullAgain">Try another spot</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SAVED ============ -->
+<section class="screen" id="s-saved">
+  <header class="page-head">
+    <button class="back-btn" data-home aria-label="Back to camera">
+      <svg class="icon"><use href="#i-back"/></svg>
+    </button>
+    <h2>Saved</h2>
+  </header>
+  <div class="page-body">
+    <p class="saved-sub" id="savedSub"></p>
+    <div id="savedList"></div>
+  </div>
+</section>
+
+<!-- ============ ABOUT ============ -->
+<section class="screen" id="s-about">
+  <header class="page-head">
+    <button class="back-btn" data-home aria-label="Back to camera">
+      <svg class="icon"><use href="#i-back"/></svg>
+    </button>
+    <h2>About Soon</h2>
+  </header>
+  <div class="page-body about">
+    <p>Point Soon at a neglected spot on your block. It reads what kind of place it is, picks one small improvement that would genuinely help, renders it onto your photo, and tells you who to ask.</p>
+    <p>Every idea comes from a fixed catalog of real Chicago interventions, each with a researched civic path. Soon will also tell you when a corner already works and needs nothing.</p>
+
+    <h3>Service status</h3>
+    <div class="status-row" id="stAnalyze">
+      <span class="dot"></span><span class="what">Reading the block</span><span class="state">Checking…</span>
+    </div>
+    <div class="status-row" id="stRender">
+      <span class="dot"></span><span class="what">Rendering the idea</span><span class="state">Checking…</span>
+    </div>
+
+    <h3>The fine print</h3>
+    <p>Your photo is sent to an AI model to draft the idea, and to an image model to render it. Nothing is posted anywhere and nothing is stored on the server. Saved ideas live on this device only.</p>
+    <p>Rendered images are AI generated. They are not photographs of anything that exists, and they are not a proposal, permit or promise. Verify every civic path with the city and the ward office before acting on it.</p>
+  </div>
+</section>
+
+</div>
+
+<input type="file" accept="image/*" capture="environment" id="file" hidden />
+
+<script type="module">
+const $ = (id) => document.getElementById(id);
+
+/* ===================== catalog (served by /api/catalog) ===================== */
+let CATALOG = { sites: {}, patterns: {} };
+const CATALOG_CACHE = "soon.catalog.v1";
+
+async function loadCatalog() {
+  try {
+    const r = await fetch("/api/catalog");
+    if (!r.ok) throw new Error("http " + r.status);
+    CATALOG = await r.json();
+    try { localStorage.setItem(CATALOG_CACHE, JSON.stringify(CATALOG)); } catch {}
+  } catch {
+    // A stale catalog still renders saved ideas correctly while offline.
+    try {
+      const cached = localStorage.getItem(CATALOG_CACHE);
+      if (cached) CATALOG = JSON.parse(cached);
+    } catch {}
+  }
+}
+
+/* ===================== state ===================== */
+const S = { b64: null, url: null, coords: null, idea: null, render: null };
+let SAVED = [];
+try { SAVED = JSON.parse(localStorage.getItem("soon.saved") || "[]"); } catch {}
+const persist = () => { try { localStorage.setItem("soon.saved", JSON.stringify(SAVED)); } catch {} };
+
+/* ===================== navigation ===================== */
+const SCREENS = ["s-home", "s-work", "s-result", "s-null", "s-saved", "s-about"];
+let current = "s-home";
+
+function go(id) {
+  if (id === current) return;
+  SCREENS.forEach((s) => $(s).classList.toggle("on", s === id));
+  $(id).scrollTop = 0;
+  current = id;
+  if (id === "s-saved") paintSaved();
+  if (id === "s-about") paintStatus();
+  if (id === "s-home") { if (!stream) openCamera(); } else { closeCamera(); }
+}
+
+document.querySelectorAll("[data-home]").forEach((b) => b.addEventListener("click", () => go("s-home")));
+$("toSaved").addEventListener("click", () => go("s-saved"));
+$("toSaved2").addEventListener("click", () => go("s-saved"));
+$("toAbout").addEventListener("click", () => go("s-about"));
+$("toAbout2").addEventListener("click", () => go("s-about"));
+$("closeResult").addEventListener("click", () => go("s-home"));
+$("closeNull").addEventListener("click", () => go("s-home"));
+$("nullAgain").addEventListener("click", () => $("file").click());
+
+function paintSavedCount() {
+  const n = SAVED.length;
+  const dot = $("savedCount");
+  dot.textContent = n > 9 ? "9+" : String(n);
+  dot.hidden = n === 0;
+}
+
+/* ===================== live camera ===================== */
+let stream = null;
+let facing = "environment";
+
+async function openCamera() {
+  if (!navigator.mediaDevices?.getUserMedia) {
+    return camFail("This browser will not open a camera here. Choose a photo instead.");
+  }
+  if (!window.isSecureContext) {
+    return camFail("The camera needs a secure connection. Serve this over https, or choose a photo instead.");
+  }
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: facing }, width: { ideal: 1920 }, height: { ideal: 1440 } },
+      audio: false,
+    });
+    const v = $("live");
+    v.srcObject = stream;
+    v.play().catch(() => {});
+    $("camOff").hidden = true;
+    $("cameraUI").hidden = false;
+    $("trigger").disabled = false;
+  } catch (err) {
+    camFail(
+      err?.name === "NotAllowedError" || err?.name === "SecurityError"
+        ? "Camera access is off. Turn it on in your browser settings, or choose a photo instead."
+        : "No camera available here. Choose a photo instead."
+    );
+  }
+}
+
+function camFail(msg) {
+  stream = null;
+  $("camOffWhy").textContent = msg;
+  $("camOff").hidden = false;
+  $("cameraUI").hidden = true;
+}
+
+function closeCamera() {
+  if (stream) { stream.getTracks().forEach((t) => t.stop()); stream = null; }
+  $("live").srcObject = null;
+}
+
+$("flipBtn").addEventListener("click", () => {
+  facing = facing === "environment" ? "user" : "environment";
+  closeCamera();
+  openCamera();
+});
+$("rollBtn").addEventListener("click", () => $("file").click());
+$("pickPhoto").addEventListener("click", () => $("file").click());
+
+$("trigger").addEventListener("click", () => {
+  if (!stream) return;
+  const v = $("live");
+  const vw = v.videoWidth, vh = v.videoHeight;
+  if (!vw || !vh) return;
+
+  $("flash").classList.remove("go");
+  void $("flash").offsetWidth;
+  $("flash").classList.add("go");
+
+  // Crop the stream to what is actually on screen, then cap the long edge at 1024.
+  const boxW = v.clientWidth, boxH = v.clientHeight;
+  const scale = Math.max(boxW / vw, boxH / vh);
+  const sw = Math.min(vw, boxW / scale), sh = Math.min(vh, boxH / scale);
+  const sx = (vw - sw) / 2, sy = (vh - sh) / 2;
+  const k = Math.min(1024, Math.max(sw, sh)) / Math.max(sw, sh);
+  const cw = Math.round(sw * k), ch = Math.round(sh * k);
+
+  const c = document.createElement("canvas");
+  c.width = cw; c.height = ch;
+  const ctx = c.getContext("2d");
+  if (facing === "user") { ctx.translate(cw, 0); ctx.scale(-1, 1); }
+  ctx.drawImage(v, sx, sy, sw, sh, 0, 0, cw, ch);
+  const url = c.toDataURL("image/jpeg", 0.85);
+  useShot({ url, b64: url.split(",")[1] });
+});
+
+$("file").addEventListener("change", async (e) => {
+  const f = e.target.files?.[0];
+  e.target.value = "";
+  if (!f) return;
+  try { useShot(await shrink(f)); }
+  catch { alert("That image would not open. Try another photo."); }
+});
+
+function shrink(file) {
+  return new Promise((res, rej) => {
+    const fr = new FileReader();
+    fr.onerror = rej;
+    fr.onload = () => {
+      const im = new Image();
+      im.onerror = rej;
+      im.onload = () => {
+        const s = Math.min(1, 1024 / Math.max(im.width, im.height));
+        const w = Math.round(im.width * s), h = Math.round(im.height * s);
+        const c = document.createElement("canvas");
+        c.width = w; c.height = h;
+        c.getContext("2d").drawImage(im, 0, 0, w, h);
+        const u = c.toDataURL("image/jpeg", 0.85);
+        res({ url: u, b64: u.split(",")[1] });
+      };
+      im.src = fr.result;
+    };
+    fr.readAsDataURL(file);
+  });
+}
+
+/* Shared entry point for both the live shot and the file picker. */
+function useShot(r) {
+  S.b64 = r.b64; S.url = r.url; S.idea = null; S.render = null;
+  $("workImg").src = r.url;
+  $("origImg").src = r.url;
+  $("nullImg").src = r.url;
+  locate();
+  go("s-work");
+  analyze();
+}
+
+function locate() {
+  S.coords = null;
+  if (!navigator.geolocation) return;
+  navigator.geolocation.getCurrentPosition(
+    (p) => { S.coords = { lat: p.coords.latitude, lng: p.coords.longitude }; if (S.idea) paintPin(); },
+    () => {},
+    { timeout: 7000, maximumAge: 120000 }
+  );
+}
+
+/* ===================== working lines ===================== */
+const LINES = [
+  "Reading the block", "Working out what kind of place this is",
+  "Checking what is already here", "Finding the one thing that would help",
+  "Sizing it to the space", "Naming it", "Working out what it would take",
+];
+let tick = null;
+
+function startLines() {
+  let i = 0;
+  const el = $("workLine");
+  el.textContent = LINES[0];
+  tick = setInterval(() => {
+    i = Math.min(i + 1, LINES.length - 1);
+    el.classList.add("fade");
+    setTimeout(() => { el.textContent = LINES[i]; el.classList.remove("fade"); }, 180);
+  }, 2400);
+}
+const stopLines = () => { clearInterval(tick); tick = null; };
+
+/* ===================== analysis ===================== */
+async function analyze() {
+  startLines();
+  try {
+    const r = await fetch("/api/analyze", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ image: S.b64 }),
+    });
+    const data = await r.json().catch(() => null);
+    if (!r.ok || !data?.ok) throw new ApiError(data);
+
+    stopLines();
+    const idea = data.idea;
+
+    if (idea.needed === false) {
+      $("nullWhy").textContent = idea.nullWhy || "";
+      go("s-null");
+      return;
+    }
+
+    S.idea = idea;
+    paintResult(idea);
+    go("s-result");
+    doRender(idea);
+  } catch (err) {
+    stopLines();
+    S.idea = null;
+    paintBlank();
+    showError(
+      "The idea did not come back.",
+      err instanceof ApiError ? err.message : "The connection dropped. Take the photo again."
+    );
+    go("s-result");
+  }
+}
+
+class ApiError extends Error {
+  constructor(data) {
+    super(data?.message || "Something went wrong on the server.");
+    this.code = data?.code;
+  }
+}
+
+function showError(title, detail) {
+  const box = document.createElement("div");
+  box.className = "err";
+  const b = document.createElement("b");
+  b.textContent = title;
+  box.append(b, document.createTextNode(detail));
+  $("errSlot").replaceChildren(box);
+}
+
+/* ===================== render ===================== */
+async function doRender(idea) {
+  $("developing").hidden = false;
+  $("renderImg").src = S.url;
+
+  try {
+    const r = await fetch("/api/render", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ image: S.b64, patternId: idea.patternId, placement: idea.placement }),
+    });
+    const data = await r.json().catch(() => null);
+    if (!r.ok || !data?.ok) throw new ApiError(data);
+
+    S.render = data.url;
+    $("renderImg").src = data.url;
+    $("developing").hidden = true;
+  } catch (err) {
+    $("developing").hidden = true;
+    $("hero").classList.add("compare");
+    $("peekLabel").textContent = err?.code === "no_key" ? "Render not configured" : "Render unavailable";
+  }
+}
+
+/* ===================== result paint ===================== */
+function paintBlank() {
+  $("chipSite").hidden = true;
+  $("chipPattern").hidden = true;
+  $("rName").textContent = "";
+  $("rLede").textContent = "";
+  $("whyCard").hidden = true;
+  $("rSteps").replaceChildren();
+  $("rNote").value = "";
+  $("renderImg").src = S.url || "";
+  $("hero").classList.add("compare");
+  $("developing").hidden = true;
+  $("pinBadge").hidden = true;
+  $("peekLabel").textContent = "Your photo";
+}
+
+function paintResult(i) {
+  const p = CATALOG.patterns[i.patternId] || { n: i.patternId, lever: "", path: "" };
+  $("errSlot").replaceChildren();
+  $("hero").classList.remove("compare");
+  $("peekLabel").textContent = "Hold to compare";
+  $("whyCard").hidden = false;
+
+  const site = CATALOG.sites[i.site] || i.site || "";
+  $("chipSite").textContent = site;
+  $("chipSite").hidden = !site;
+  $("chipPattern").textContent = [p.lever, p.n].filter(Boolean).join(" · ");
+  $("chipPattern").hidden = !p.n;
+
+  $("rName").textContent = i.placeName || "";
+  $("rLede").textContent = i.lede || "";
+  $("rWhy").textContent = i.why || "";
+
+  const plan = $("rPlan");
+  plan.hidden = !i.planTie;
+  if (i.planTie) {
+    const b = document.createElement("b");
+    b.textContent = "Ward plan";
+    plan.replaceChildren(b, document.createTextNode(i.planTie));
+  }
+
+  const steps = (i.steps || []).slice(0, 3).map((s, n) => stepRow(String(n + 1), s.do, s.who));
+  if (p.path) steps.push(stepRow(null, "Who owns this kind of change", p.path));
+  $("rSteps").replaceChildren(...steps);
+
+  $("rNote").value = "";
+  $("saveLabel").textContent = "Save this idea";
+  paintPin();
+}
+
+function stepRow(n, title, sub) {
+  const li = document.createElement("li");
+  const num = document.createElement("div");
+  num.className = n ? "num" : "num owner";
+  if (n) {
+    num.textContent = n;
+  } else {
+    num.innerHTML = '<svg class="icon"><use href="#i-owner"/></svg>';
+  }
+  const box = document.createElement("div");
+  const b = document.createElement("b");
+  b.textContent = title || "";
+  const s = document.createElement("span");
+  s.textContent = sub || "";
+  box.append(b, s);
+  li.append(num, box);
+  return li;
+}
+
+function paintPin() {
+  if (!S.coords) { $("pinBadge").hidden = true; return; }
+  $("pinText").textContent = `${S.coords.lat.toFixed(4)}, ${S.coords.lng.toFixed(4)}`;
+  $("pinBadge").hidden = false;
+}
+
+/* Press and hold the pill to see the original. */
+const peek = $("peek");
+peek.addEventListener("pointerdown", (e) => { e.preventDefault(); $("hero").classList.add("compare"); });
+["pointerup", "pointercancel", "pointerleave"].forEach((ev) =>
+  peek.addEventListener(ev, () => { if (S.render) $("hero").classList.remove("compare"); })
+);
+
+/* ===================== save / share ===================== */
+$("saveBtn").addEventListener("click", () => {
+  if (!S.idea) return;
+  const p = CATALOG.patterns[S.idea.patternId] || {};
+  SAVED.unshift({
+    id: Date.now(),
+    name: S.idea.placeName, where: S.idea.where,
+    pattern: p.n || "", lever: p.lever || "", site: S.idea.site,
+    lede: S.idea.lede, why: S.idea.why, planTie: S.idea.planTie,
+    steps: S.idea.steps, note: $("rNote").value.trim(),
+    coords: S.coords, thumb: S.url, render: S.render || null,
+    at: new Date().toISOString(),
+  });
+  persist();
+  paintSavedCount();
+  $("saveLabel").textContent = "Saved";
+  setTimeout(() => go("s-saved"), 650);
+});
+
+$("discardBtn").addEventListener("click", () => go("s-home"));
+
+$("shareBtn").addEventListener("click", async () => {
+  const i = S.idea;
+  if (!i) return;
+  const p = CATALOG.patterns[i.patternId] || {};
+  const out = [i.placeName, i.where || "", "", i.lede, "", i.why, ""];
+  if (i.planTie) out.push("Ward plan: " + i.planTie, "");
+  out.push("To make it real:");
+  (i.steps || []).forEach((s, n) => out.push(`${n + 1}. ${s.do}  (${s.who})`));
+  if (p.path) out.push("", "Who owns it: " + p.path);
+  const note = $("rNote").value.trim();
+  if (note) out.push("", "Why this matters: " + note);
+  out.push("", "Imagined with Soon. A North Star Neighborhood tool. The image is AI generated, not a photograph of anything that exists.");
+  const text = out.join("\n");
+
+  if (navigator.share) {
+    navigator.share({ title: i.placeName, text }).catch(() => {});
+  } else if (navigator.clipboard) {
+    await navigator.clipboard.writeText(text);
+    $("shareLabel").textContent = "Copied";
+    setTimeout(() => { $("shareLabel").textContent = "Share"; }, 1500);
+  }
+});
+
+/* ===================== saved list ===================== */
+function paintSaved() {
+  $("savedSub").textContent = SAVED.length
+    ? `${SAVED.length} idea${SAVED.length === 1 ? "" : "s"} on this device`
+    : "";
+
+  if (!SAVED.length) {
+    const empty = document.createElement("div");
+    empty.className = "empty";
+    empty.innerHTML =
+      '<svg class="icon"><use href="#i-layers"/></svg>' +
+      "<p>Nothing saved yet. Snap a spot on your block and it will show up here.</p>";
+    $("savedList").replaceChildren(empty);
+    return;
+  }
+
+  $("savedList").replaceChildren(
+    ...SAVED.map((s) => {
+      const b = document.createElement("button");
+      b.className = "saved-card";
+      const im = document.createElement("img");
+      im.src = s.render || s.thumb;
+      im.alt = "";
+      im.loading = "lazy";
+      const meta = document.createElement("div");
+      meta.className = "meta";
+      const t = document.createElement("b");
+      t.textContent = s.name;
+      const m = document.createElement("span");
+      m.textContent = [s.pattern, s.where].filter(Boolean).join("  ·  ");
+      meta.append(t, m);
+      const chev = document.createElement("div");
+      chev.innerHTML = '<svg class="icon"><use href="#i-chevron"/></svg>';
+      b.append(im, meta, chev.firstChild);
+      b.addEventListener("click", () => replay(s));
+      return b;
+    })
+  );
+}
+
+function replay(s) {
+  S.url = s.thumb; S.render = s.render; S.coords = s.coords;
+  const patternId = Object.keys(CATALOG.patterns).find((k) => CATALOG.patterns[k].n === s.pattern) || "";
+  S.idea = {
+    site: s.site, patternId, placeName: s.name, where: s.where,
+    lede: s.lede, why: s.why, planTie: s.planTie, steps: s.steps,
+  };
+  $("origImg").src = s.thumb;
+  $("renderImg").src = s.render || s.thumb;
+  $("developing").hidden = true;
+  paintResult(S.idea);
+  if (!s.render) {
+    $("hero").classList.add("compare");
+    $("peekLabel").textContent = "Not rendered";
+  }
+  $("rNote").value = s.note || "";
+  go("s-result");
+}
+
+/* ===================== about: service status ===================== */
+let statusLoaded = false;
+
+async function paintStatus() {
+  if (statusLoaded) return;
+  const set = (el, on, onText, offText) => {
+    el.classList.toggle("ok", on);
+    el.classList.toggle("off", !on);
+    el.querySelector(".state").textContent = on ? onText : offText;
+  };
+  try {
+    const r = await fetch("/api/health");
+    const d = await r.json();
+    set($("stAnalyze"), d.analyze, "Ready", "No server key");
+    set($("stRender"), d.render, "Ready", "No server key");
+    statusLoaded = true;
+  } catch {
+    set($("stAnalyze"), false, "", "Unreachable");
+    set($("stRender"), false, "", "Unreachable");
+  }
+}
+
+/* ===================== boot ===================== */
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) closeCamera();
+  else if (current === "s-home" && !stream) openCamera();
+});
+window.addEventListener("pagehide", closeCamera);
+
+paintSavedCount();
+loadCatalog();
+openCamera();
+</script>
+</body>
+</html>

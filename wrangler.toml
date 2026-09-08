@@ -1,0 +1,9 @@
+name = "soon"
+compatibility_date = "2026-09-01"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = "public"
+
+# Secrets are never in this file. Set them once per environment:
+#   npx wrangler pages secret put ANTHROPIC_API_KEY
+#   npx wrangler pages secret put FAL_KEY
+# For local dev, put them in .dev.vars (git-ignored).
