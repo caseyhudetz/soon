@@ -15,6 +15,7 @@ public/index.html        the whole app
 functions/api/analyze    photo  -> the idea       (Claude, structured output)
 functions/api/render     photo  -> the render     (fal, Flux Kontext)
 functions/api/catalog    the display half of the pattern catalog
+functions/api/crashes    point -> reported crashes nearby (Chicago Data Portal)
 functions/api/health     which keys are configured
 shared/catalog.js        patterns, ward plan, both prompts — single source of truth
 ```
@@ -47,7 +48,23 @@ Without `ANTHROPIC_API_KEY` the app cannot produce an idea. Without `FAL_KEY`
 it still produces the idea, the reasoning and the civic steps, and shows your
 original photo instead of a render. The About screen reports both.
 
+## Crash Lens
+
+"Crashes around you" on the camera screen opens a lens over CPD's Traffic
+Crashes dataset (`85ca-t3if`). Hold the phone up and pins sit where crashes
+were reported; lay it flat, or open it on a phone without a compass, for a
+top-down map. Placement uses GPS and the compass (`deviceorientationabsolute`
+on Android, `webkitCompassHeading` on iOS), so expect pins to be off by a few
+dozen meters. Tapping a pin's "Snap this corner" goes back to the camera, and
+any idea you snap gets an "On the record" card listing crashes within 60 m.
+
+The portal needs no key. Under load, set `SOCRATA_APP_TOKEN` to raise its rate
+limit. Open `/?at=41.9399,-87.6442` on a desktop to pin the lens to a spot.
+
 ## Notes for later
+
+- The lens draws in portrait only and assumes a ~66° camera field of view. If
+  pins sit consistently left or right of real crash sites, tune `FOV_LONG`.
 
 - `/api/render` calls fal synchronously and a Kontext edit runs 10–20s. If that
   starts timing out, switch to fal's queue endpoint and poll.

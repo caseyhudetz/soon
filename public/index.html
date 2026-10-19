@@ -297,6 +297,53 @@ svg{display:block;flex:none}
 .status-row .what{flex:1}
 .status-row .state{color:var(--dim);font-size:13px}
 
+/* ---------- crash lens ---------- */
+:root{--ped:#FF6B5B;--bike:#5BB8FF;--car:#9AA1B2}
+.lens-pill{width:max-content;margin:0 auto 16px;gap:8px;padding:9px 15px 9px 13px;border-radius:22px;
+  font-size:13px;font-weight:500}
+.lens-pill .icon{width:15px;height:15px}
+.cam-off .lens-pill{margin:12px auto 0}
+
+#s-lens{background:#000;overflow:hidden}
+#lensLive{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000;
+  transition:opacity var(--med) ease}
+#s-lens.flat #lensLive{opacity:.16}
+#lensCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:2;touch-action:none}
+#s-lens .scrim{z-index:1}
+.lens-ui{position:relative;z-index:3;flex:1;display:flex;flex-direction:column;min-height:0;pointer-events:none}
+.lens-ui > *{pointer-events:auto}
+.lens-top{display:flex;align-items:center;gap:12px;padding:calc(var(--safe-t) + 12px) var(--pad) 0;
+  align-self:flex-start}
+.lens-title b{display:block;font-family:'Bricolage Grotesque',Inter,sans-serif;font-weight:700;font-size:19px;
+  letter-spacing:-.03em;line-height:1.15;text-shadow:0 1px 14px rgba(0,0,0,.6)}
+.lens-title span{display:block;font-size:12px;color:rgba(242,239,233,.75);text-shadow:0 1px 10px rgba(0,0,0,.7)}
+
+.lens-card{margin:auto var(--pad) calc(var(--safe-b) + 18px);padding:16px;border-radius:var(--r-lg);
+  background:rgba(10,12,16,.62);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);
+  border:1px solid rgba(255,255,255,.12)}
+.lens-card .eyebrow{display:block;margin-bottom:12px}
+.lens-card .msg{margin:0;font-size:14px;line-height:1.55;color:rgba(242,239,233,.88)}
+.lens-card .msg + .btn{margin-top:14px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.stat b{display:block;font-family:'Bricolage Grotesque',Inter,sans-serif;font-weight:700;font-size:28px;
+  letter-spacing:-.03em;line-height:1}
+.stat span{display:block;font-size:11.5px;line-height:1.35;color:var(--dim);margin-top:6px}
+.legend{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;font-size:12px;color:var(--dim)}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:-.5px}
+.legend i.sev{background:transparent;border:2px solid #fff;width:10px;height:10px}
+.lens-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;
+  padding-top:12px;border-top:1px solid var(--line-soft)}
+.lens-row .tip{font-size:12px;color:var(--faint);line-height:1.4}
+.toggle{flex:none;font-size:12px;font-weight:500;padding:7px 11px;border-radius:16px;
+  background:var(--raised);border:1px solid var(--line)}
+.crash-list{margin:0 0 14px;padding:0;list-style:none}
+.crash-list li{padding:9px 0;border-top:1px solid var(--line-soft);font-size:13.5px;line-height:1.4}
+.crash-list li > span{display:block;font-size:12.5px;color:var(--dim);margin-top:2px}
+.crash-list .k{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;vertical-align:.5px}
+.lens-card h3{font-family:'Bricolage Grotesque',Inter,sans-serif;font-weight:700;font-size:21px;
+  letter-spacing:-.03em;margin:0 0 3px}
+.lens-card .sub{font-size:12.5px;color:var(--dim);margin:0 0 10px}
+
 @media (prefers-reduced-motion:reduce){
   *{animation-duration:.001ms !important;animation-iteration-count:1 !important;
     transition-duration:.001ms !important}
@@ -321,6 +368,7 @@ svg{display:block;flex:none}
   <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
   <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13.8a3.6 3.6 0 0 0 5.3.4l2.6-2.6a3.6 3.6 0 0 0-5.1-5.1l-1.5 1.5"/><path d="M14 10.2a3.6 3.6 0 0 0-5.3-.4l-2.6 2.6a3.6 3.6 0 0 0 5.1 5.1l1.5-1.5"/></symbol>
   <symbol id="i-owner" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-radar" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><path d="M12 12 18 6"/><circle cx="15.5" cy="15" r="1" fill="currentColor" stroke="none"/></symbol>
 </defs></svg>
 
 <div id="app">
@@ -344,6 +392,9 @@ svg{display:block;flex:none}
     </header>
 
     <div class="cam-bottom">
+      <button class="glass lens-pill" id="toLens">
+        <svg class="icon"><use href="#i-radar"/></svg>Crashes around you
+      </button>
       <p class="hint">Point at a spot on your block.<br>An alley, a blank wall, a dead corner.</p>
       <div class="controls">
         <button class="glass glass-round" id="rollBtn" aria-label="Choose from library">
@@ -368,6 +419,25 @@ svg{display:block;flex:none}
       <button class="btn btn-ghost btn-sm" id="toSaved2" style="width:auto;padding-inline:18px">Saved</button>
       <button class="btn btn-ghost btn-sm" id="toAbout2" style="width:auto;padding-inline:18px">About</button>
     </div>
+    <button class="glass lens-pill" id="toLens2">
+      <svg class="icon"><use href="#i-radar"/></svg>Crashes around you
+    </button>
+  </div>
+</section>
+
+<!-- ============ CRASH LENS ============ -->
+<section class="screen" id="s-lens">
+  <video id="lensLive" playsinline muted autoplay></video>
+  <div class="scrim"></div>
+  <canvas id="lensCanvas" aria-label="Reported crashes around you"></canvas>
+  <div class="lens-ui">
+    <header class="lens-top" id="lensTop">
+      <button class="glass glass-round" data-home aria-label="Back to camera">
+        <svg class="icon"><use href="#i-back"/></svg>
+      </button>
+      <div class="lens-title"><b>Crash Lens</b><span>Reported crashes around you</span></div>
+    </header>
+    <div class="lens-card" id="lensCard" aria-live="polite"></div>
   </div>
 </section>
 
@@ -415,6 +485,11 @@ svg{display:block;flex:none}
       <span class="eyebrow">Why this works</span>
       <p id="rWhy"></p>
       <div class="plan" id="rPlan" hidden></div>
+    </div>
+
+    <div class="card" id="evCard" hidden>
+      <span class="eyebrow">On the record</span>
+      <p id="evText"></p>
     </div>
 
     <span class="eyebrow section-label">To make it real</span>
@@ -490,6 +565,7 @@ svg{display:block;flex:none}
   <div class="page-body about">
     <p>Point Soon at a neglected spot on your block. It reads what kind of place it is, picks one small improvement that would genuinely help, renders it onto your photo, and tells you who to ask.</p>
     <p>Every idea comes from a fixed catalog of real Chicago interventions, each with a researched civic path. Soon will also tell you when a corner already works and needs nothing.</p>
+    <p>Crash Lens shows where crashes have been reported around you. Hold your phone up to see them in place, or lay it flat for a map. Tap a pin for details, then snap that corner for an idea that would make it safer.</p>
 
     <h3>Service status</h3>
     <div class="status-row" id="stAnalyze">
@@ -502,6 +578,7 @@ svg{display:block;flex:none}
     <h3>The fine print</h3>
     <p>Your photo is sent to an AI model to draft the idea, and to an image model to render it. Nothing is posted anywhere and nothing is stored on the server. Saved ideas live on this device only.</p>
     <p>Rendered images are AI generated. They are not photographs of anything that exists, and they are not a proposal, permit or promise. Verify every civic path with the city and the ward office before acting on it.</p>
+    <p>Crash records come from the Chicago Police Department's Traffic Crashes dataset on the City of Chicago Data Portal. They include only crashes that were reported, and locations are rounded by the police. To look them up, your location is sent to the server, which forwards it to the data portal. Pins are placed with your phone's GPS and compass, so treat them as within a few dozen meters.</p>
   </div>
 </section>
 
@@ -532,23 +609,30 @@ async function loadCatalog() {
 }
 
 /* ===================== state ===================== */
-const S = { b64: null, url: null, coords: null, idea: null, render: null };
+// evidence: undefined = not looked up yet, null = in flight, "" = nothing on record.
+const S = { b64: null, url: null, coords: null, idea: null, render: null, evidence: undefined };
+let shotSeq = 0;
 let SAVED = [];
 try { SAVED = JSON.parse(localStorage.getItem("soon.saved") || "[]"); } catch {}
 const persist = () => { try { localStorage.setItem("soon.saved", JSON.stringify(SAVED)); } catch {} };
 
 /* ===================== navigation ===================== */
-const SCREENS = ["s-home", "s-work", "s-result", "s-null", "s-saved", "s-about"];
+const SCREENS = ["s-home", "s-work", "s-result", "s-null", "s-saved", "s-about", "s-lens"];
+const LIVE = new Set(["s-home", "s-lens"]);
 let current = "s-home";
 
 function go(id) {
   if (id === current) return;
+  const prev = current;
   SCREENS.forEach((s) => $(s).classList.toggle("on", s === id));
   $(id).scrollTop = 0;
   current = id;
   if (id === "s-saved") paintSaved();
   if (id === "s-about") paintStatus();
-  if (id === "s-home") { if (!stream) openCamera(); } else { closeCamera(); }
+  // The lens looks out at the street, whichever way the home camera was flipped.
+  if (id === "s-lens" && facing !== "environment") { facing = "environment"; closeCamera(); }
+  if (LIVE.has(id)) { if (stream) attachStream(); else openCamera(); } else { closeCamera(); }
+  if (id === "s-lens") lensStart(); else if (prev === "s-lens") lensStop();
 }
 
 document.querySelectorAll("[data-home]").forEach((b) => b.addEventListener("click", () => go("s-home")));
@@ -559,6 +643,8 @@ $("toAbout2").addEventListener("click", () => go("s-about"));
 $("closeResult").addEventListener("click", () => go("s-home"));
 $("closeNull").addEventListener("click", () => go("s-home"));
 $("nullAgain").addEventListener("click", () => $("file").click());
+$("toLens").addEventListener("click", openLens);
+$("toLens2").addEventListener("click", openLens);
 
 function paintSavedCount() {
   const n = SAVED.length;
@@ -583,9 +669,7 @@ async function openCamera() {
       video: { facingMode: { ideal: facing }, width: { ideal: 1920 }, height: { ideal: 1440 } },
       audio: false,
     });
-    const v = $("live");
-    v.srcObject = stream;
-    v.play().catch(() => {});
+    attachStream();
     $("camOff").hidden = true;
     $("cameraUI").hidden = false;
     $("trigger").disabled = false;
@@ -605,9 +689,19 @@ function camFail(msg) {
   $("cameraUI").hidden = true;
 }
 
+/* One stream, shown by whichever live screen is up. */
+function attachStream() {
+  const lens = current === "s-lens";
+  $(lens ? "live" : "lensLive").srcObject = null;
+  const v = $(lens ? "lensLive" : "live");
+  v.srcObject = stream;
+  v.play().catch(() => {});
+}
+
 function closeCamera() {
   if (stream) { stream.getTracks().forEach((t) => t.stop()); stream = null; }
   $("live").srcObject = null;
+  $("lensLive").srcObject = null;
 }
 
 $("flipBtn").addEventListener("click", () => {
@@ -677,7 +771,8 @@ function shrink(file) {
 
 /* Shared entry point for both the live shot and the file picker. */
 function useShot(r) {
-  S.b64 = r.b64; S.url = r.url; S.idea = null; S.render = null;
+  S.b64 = r.b64; S.url = r.url; S.idea = null; S.render = null; S.evidence = undefined;
+  shotSeq++;
   $("workImg").src = r.url;
   $("origImg").src = r.url;
   $("nullImg").src = r.url;
@@ -690,7 +785,10 @@ function locate() {
   S.coords = null;
   if (!navigator.geolocation) return;
   navigator.geolocation.getCurrentPosition(
-    (p) => { S.coords = { lat: p.coords.latitude, lng: p.coords.longitude }; if (S.idea) paintPin(); },
+    (p) => {
+      S.coords = { lat: p.coords.latitude, lng: p.coords.longitude };
+      if (S.idea) { paintPin(); loadEvidence(); }
+    },
     () => {},
     { timeout: 7000, maximumAge: 120000 }
   );
@@ -800,6 +898,7 @@ function paintBlank() {
   $("rName").textContent = "";
   $("rLede").textContent = "";
   $("whyCard").hidden = true;
+  $("evCard").hidden = true;
   $("rSteps").replaceChildren();
   $("rNote").value = "";
   $("renderImg").src = S.url || "";
@@ -841,6 +940,48 @@ function paintResult(i) {
   $("rNote").value = "";
   $("saveLabel").textContent = "Save this idea";
   paintPin();
+  paintEvidence();
+  loadEvidence();
+}
+
+/* ===================== evidence: crashes near the photo ===================== */
+const EV_R = 60;
+
+async function loadEvidence() {
+  if (!S.coords || !S.idea || S.evidence !== undefined) return;
+  S.evidence = null;
+  const seq = shotSeq;
+  try {
+    const r = await fetch(`/api/crashes?lat=${S.coords.lat.toFixed(5)}&lng=${S.coords.lng.toFixed(5)}&r=${EV_R}`);
+    const d = await r.json().catch(() => null);
+    if (seq !== shotSeq) return;
+    S.evidence = r.ok && d?.ok ? evidenceLine(d) : "";
+  } catch {
+    if (seq === shotSeq) S.evidence = "";
+  }
+  paintEvidence();
+}
+
+function paintEvidence() {
+  $("evText").textContent = S.evidence || "";
+  $("evCard").hidden = !S.evidence;
+}
+
+function evidenceLine(d) {
+  const list = d.crashes || [];
+  if (!list.length) return "";
+  const n = list.length;
+  const peds = list.filter((c) => c.kind === "ped").length;
+  const bikes = list.filter((c) => c.kind === "bike").length;
+  const hurt = list.reduce((sum, c) => sum + (c.hurt || 0), 0);
+  const ksi = list.filter((c) => c.sev === "fatal" || c.sev === "serious").length;
+
+  const out = [`Since ${d.since.slice(0, 4)}, police recorded ${n} crash${n === 1 ? "" : "es"} within ${d.radius} m of this spot.`];
+  const struck = [peds && `${peds} struck a pedestrian`, bikes && `${bikes} struck a cyclist`].filter(Boolean);
+  if (struck.length) out.push(struck.join(", ") + ".");
+  if (hurt) out.push(`${hurt} ${hurt === 1 ? "person was" : "people were"} hurt.`);
+  if (ksi) out.push(`${ksi} ${ksi === 1 ? "crash" : "crashes"} killed or seriously injured someone.`);
+  return out.join(" ");
 }
 
 function stepRow(n, title, sub) {
@@ -884,7 +1025,7 @@ $("saveBtn").addEventListener("click", () => {
     name: S.idea.placeName, where: S.idea.where,
     pattern: p.n || "", lever: p.lever || "", site: S.idea.site,
     lede: S.idea.lede, why: S.idea.why, planTie: S.idea.planTie,
-    steps: S.idea.steps, note: $("rNote").value.trim(),
+    steps: S.idea.steps, note: $("rNote").value.trim(), evidence: S.evidence || null,
     coords: S.coords, thumb: S.url, render: S.render || null,
     at: new Date().toISOString(),
   });
@@ -902,6 +1043,7 @@ $("shareBtn").addEventListener("click", async () => {
   const p = CATALOG.patterns[i.patternId] || {};
   const out = [i.placeName, i.where || "", "", i.lede, "", i.why, ""];
   if (i.planTie) out.push("Ward plan: " + i.planTie, "");
+  if (S.evidence) out.push("On the record: " + S.evidence, "");
   out.push("To make it real:");
   (i.steps || []).forEach((s, n) => out.push(`${n + 1}. ${s.do}  (${s.who})`));
   if (p.path) out.push("", "Who owns it: " + p.path);
@@ -961,6 +1103,9 @@ function paintSaved() {
 
 function replay(s) {
   S.url = s.thumb; S.render = s.render; S.coords = s.coords;
+  // Ideas saved before the lens existed have no evidence field; look it up then.
+  S.evidence = s.evidence === undefined ? undefined : s.evidence || "";
+  shotSeq++;
   const patternId = Object.keys(CATALOG.patterns).find((k) => CATALOG.patterns[k].n === s.pattern) || "";
   S.idea = {
     site: s.site, patternId, placeName: s.name, where: s.where,
@@ -976,6 +1121,442 @@ function replay(s) {
   }
   $("rNote").value = s.note || "";
   go("s-result");
+}
+
+/* ===================== crash lens ===================== */
+const LENS_R = 200;     // what the lens shows, in meters
+const FETCH_R = 320;    // what it asks for, so a short walk needs no refetch
+const REFETCH_M = 90;
+const EYE_M = 1.4;      // the phone's height above the pavement
+const FOV_LONG = 66;    // long-edge field of view of a typical main camera, degrees
+const RAD = Math.PI / 180;
+const KIND_COLOR = { ped: "#FF6B5B", bike: "#5BB8FF", car: "#9AA1B2" };
+const KIND_LABEL = { ped: "Pedestrian struck", bike: "Cyclist struck", car: "Vehicles only" };
+const SEV_LABEL = { fatal: "fatal", serious: "serious injury", hurt: "injury", none: "no injury" };
+const ABS_EVENT = "ondeviceorientationabsolute" in window ? "deviceorientationabsolute" : "deviceorientation";
+// ?at=41.9399,-87.6442 pins the lens somewhere for testing on a desktop.
+const AT = new URLSearchParams(location.search).get("at")?.split(",").map(Number);
+
+const L = {
+  pos: null, acc: null, watch: null,
+  data: null, origin: null, fetching: false, error: null,
+  clusters: [], filter: "hurt", sel: null,
+  R: null, oriAt: 0, off: null, mode: null, raf: 0, hits: [],
+};
+
+const clamp = (n, lo, hi) => Math.min(hi, Math.max(lo, n));
+const wrap180 = (d) => ((d % 360) + 540) % 360 - 180;
+const toLocal = (o, p) => ({ e: (p.lng - o.lng) * 111320 * Math.cos(o.lat * RAD), n: (p.lat - o.lat) * 110540 });
+const meters = (a, b) => { const v = toLocal(a, b); return Math.hypot(v.e, v.n); };
+const isHurt = (c) => c.kind !== "car" || c.sev !== "none";
+
+async function openLens() {
+  // iOS only hands out the compass after a prompt, and the prompt must come from a tap.
+  const DOE = window.DeviceOrientationEvent;
+  if (typeof DOE?.requestPermission === "function") {
+    try { await DOE.requestPermission(); } catch {}
+  }
+  go("s-lens");
+}
+
+function lensStart() {
+  L.sel = null;
+  addEventListener(ABS_EVENT, onOrient);
+  startWatch();
+  cancelAnimationFrame(L.raf);
+  L.raf = requestAnimationFrame(frame);
+  paintLensCard();
+}
+
+function lensStop() {
+  removeEventListener(ABS_EVENT, onOrient);
+  if (L.watch != null) navigator.geolocation.clearWatch(L.watch);
+  L.watch = null;
+  cancelAnimationFrame(L.raf);
+  L.raf = 0;
+}
+
+/* ---------- where you are ---------- */
+function startWatch() {
+  if (AT?.length === 2 && AT.every(Number.isFinite)) {
+    return onPos({ coords: { latitude: AT[0], longitude: AT[1], accuracy: 5 } });
+  }
+  if (!navigator.geolocation) {
+    L.error = "This browser will not share your location, so the lens cannot find crashes around you.";
+    return paintLensCard();
+  }
+  L.watch = navigator.geolocation.watchPosition(onPos, (err) => {
+    if (L.pos) return;
+    L.error = err.code === 1
+      ? "Location is off. Turn it on for this site to see crashes around you."
+      : "Could not find you yet. Step outside, or try again in a moment.";
+    paintLensCard();
+  }, { enableHighAccuracy: true, maximumAge: 5000, timeout: 20000 });
+}
+
+function onPos(p) {
+  L.pos = { lat: p.coords.latitude, lng: p.coords.longitude };
+  L.acc = p.coords.accuracy;
+  if (!L.data) L.error = null;
+  if (!L.origin || meters(L.origin, L.pos) > REFETCH_M) fetchCrashes(L.pos);
+  else paintLensCard();
+}
+
+async function fetchCrashes(at) {
+  if (L.fetching) return;
+  L.fetching = true;
+  // Set before the request so a failure waits for a walk or a retry, not the next GPS tick.
+  L.origin = { lat: at.lat, lng: at.lng };
+  paintLensCard();
+  try {
+    const r = await fetch(`/api/crashes?lat=${at.lat.toFixed(5)}&lng=${at.lng.toFixed(5)}&r=${FETCH_R}`);
+    const d = await r.json().catch(() => null);
+    if (!r.ok || !d?.ok) throw new ApiError(d);
+    L.data = d;
+    L.origin = d.center;
+    L.error = null;
+    cluster();
+  } catch (err) {
+    L.error = err instanceof ApiError ? err.message : "Crash records did not load. Check your connection.";
+    L.retry = true;
+  } finally {
+    L.fetching = false;
+    paintLensCard();
+  }
+}
+
+/* Crashes are geocoded to the block, so many share a point. Bin them into
+   pins about one intersection apart. */
+function cluster() {
+  const cells = new Map();
+  for (const c of L.data?.crashes || []) {
+    if (L.filter === "hurt" && !isHurt(c)) continue;
+    const p = toLocal(L.origin, c);
+    const key = Math.round(p.e / 14) + ":" + Math.round(p.n / 14);
+    let k = cells.get(key);
+    if (!k) cells.set(key, (k = { e: 0, n: 0, items: [] }));
+    k.e += p.e; k.n += p.n; k.items.push(c);
+  }
+  L.clusters = [...cells.values()].map((k) => ({
+    x: k.e / k.items.length,
+    y: k.n / k.items.length,
+    items: k.items,
+    kind: k.items.some((i) => i.kind === "ped") ? "ped" : k.items.some((i) => i.kind === "bike") ? "bike" : "car",
+    severe: k.items.some((i) => i.sev === "fatal" || i.sev === "serious"),
+  }));
+  L.sel = null;
+}
+
+/* ---------- which way the phone faces ---------- */
+
+/* Device-to-world rotation (east, north, up) from W3C device orientation angles.
+   Row-major; column 0 is the screen's right, 1 its top, 2 out of the glass. */
+function rotation(a, b, g) {
+  const cA = Math.cos(a * RAD), sA = Math.sin(a * RAD);
+  const cB = Math.cos(b * RAD), sB = Math.sin(b * RAD);
+  const cG = Math.cos(g * RAD), sG = Math.sin(g * RAD);
+  return [
+    cA * cG - sA * sB * sG, -cB * sA, cG * sA * sB + cA * sG,
+    cG * sA + cA * sB * sG, cA * cB, sA * sG - cA * cG * sB,
+    -cB * sG, sB, cB * cG,
+  ];
+}
+const camHeading = (m) => Math.atan2(-m[2], -m[5]);  // where the lens points, clockwise from north
+const topHeading = (m) => Math.atan2(m[1], m[4]);    // where the top edge points, for a phone held flat
+const isFlat = (m) => m[8] > 0.64;                   // camera tipped more than ~40° below the horizon
+const faceHeading = (m) => (isFlat(m) ? topHeading(m) : camHeading(m));
+
+function onOrient(e) {
+  if (e.alpha == null || e.beta == null || e.gamma == null) return;
+  let m = rotation(e.alpha, e.beta, e.gamma);
+  const compass = e.webkitCompassHeading;
+  if (typeof compass === "number" && compass >= 0) {
+    // iOS: alpha is relative to wherever the page started. Spin it so the way
+    // the phone faces matches the compass, smoothing out the compass's jitter.
+    const off = wrap180(compass - faceHeading(m) / RAD);
+    L.off = L.off == null ? off : L.off + wrap180(off - L.off) * 0.1;
+    m = rotation(e.alpha - L.off, e.beta, e.gamma);
+  } else if (!(e.absolute || e.type === "deviceorientationabsolute")) {
+    return; // a relative heading cannot point at anything
+  }
+  L.R = L.R ? L.R.map((v, i) => v + (m[i] - v) * 0.25) : m;
+  L.oriAt = performance.now();
+}
+
+/* ---------- drawing ---------- */
+function frame() {
+  L.raf = requestAnimationFrame(frame);
+  const cv = $("lensCanvas");
+  const dpr = Math.min(devicePixelRatio || 1, 2);
+  const W = cv.clientWidth, H = cv.clientHeight;
+  if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) {
+    cv.width = Math.round(W * dpr);
+    cv.height = Math.round(H * dpr);
+  }
+  const ctx = cv.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, W, H);
+  L.hits = [];
+
+  const oriented = L.R && performance.now() - L.oriAt < 1500;
+  const mode = oriented && stream && H >= W && !isFlat(L.R) ? "ar" : "map";
+  if (mode !== L.mode) {
+    L.mode = mode;
+    $("s-lens").classList.toggle("flat", mode === "map");
+    paintLensCard();
+  }
+  if (!L.pos || !L.data) return;
+
+  const u = toLocal(L.origin, L.pos);
+  const top = $("lensTop").getBoundingClientRect().bottom + 16;
+  if (mode === "ar") {
+    drawAR(ctx, W, H, u);
+    drawRadar(ctx, W - 20 - 46, top + 46, 46, camHeading(L.R), u, true);
+  } else {
+    const bottom = $("lensCard").getBoundingClientRect().top - 16;
+    const rad = Math.max(60, Math.min(W / 2 - 30, (bottom - top) / 2 - 14));
+    drawRadar(ctx, W / 2, Math.max(top + rad + 14, (top + bottom) / 2), rad,
+      oriented ? faceHeading(L.R) : 0, u, false);
+  }
+}
+
+function drawAR(ctx, W, H, u) {
+  const v = $("lensLive");
+  const vw = v.videoWidth || W, vh = v.videoHeight || H;
+  const s = Math.max(W / vw, H / vh); // the video is object-fit: cover
+  const f = (s * Math.max(vw, vh) / 2) / Math.tan((FOV_LONG / 2) * RAD);
+  const R = L.R;
+
+  const pts = [];
+  for (const c of L.clusters) {
+    const e = c.x - u.e, n = c.y - u.n, up = -EYE_M;
+    const dist = Math.hypot(e, n);
+    if (dist > LENS_R) continue;
+    const sx = e * R[0] + n * R[3] + up * R[6];
+    const sy = e * R[1] + n * R[4] + up * R[7];
+    const depth = -(e * R[2] + n * R[5] + up * R[8]);
+    if (depth < 1.5) continue;
+    const x = W / 2 + (f * sx) / depth, y = H / 2 - (f * sy) / depth;
+    if (x < -80 || x > W + 80 || y < -80 || y > H + 160) continue;
+    pts.push({ c, x, y, depth, dist });
+  }
+  pts.sort((a, b) => b.depth - a.depth); // far first, so near pins sit on top
+
+  for (const p of pts) {
+    const r = clamp((f * 1.4) / p.depth, 7, 22) * (1 + Math.min(p.c.items.length, 25) * 0.025);
+    const hy = p.y - clamp((f * 2.4) / p.depth, 12, 80) - r;
+    ctx.globalAlpha = clamp(1.3 - p.dist / LENS_R, 0.4, 1);
+    ctx.fillStyle = "rgba(0,0,0,.4)";
+    ctx.beginPath(); ctx.ellipse(p.x, p.y, r * 0.7, r * 0.22, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = KIND_COLOR[p.c.kind];
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x, hy + r); ctx.stroke();
+    drawDot(ctx, p.x, hy, r, p.c);
+    ctx.globalAlpha = 1;
+    if (L.sel === p.c) tag(ctx, p.x, hy - r - 14, `${Math.round(p.dist)} m`);
+    L.hits.push({ x: p.x, y: hy, r: r + 12, c: p.c });
+  }
+}
+
+/* Top-down view around you. Heading-up when the compass is live, north-up otherwise. */
+function drawRadar(ctx, cx, cy, rad, h, u, small) {
+  const k = rad / LENS_R;
+  const cos = Math.cos(h), sin = Math.sin(h);
+  const place = (e, n) => [cx + (e * cos - n * sin) * k, cy - (e * sin + n * cos) * k];
+
+  ctx.fillStyle = small ? "rgba(10,12,16,.55)" : "rgba(10,12,16,.25)";
+  ctx.beginPath(); ctx.arc(cx, cy, rad, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = "rgba(255,255,255,.14)";
+  ctx.lineWidth = 1;
+  for (const m of small ? [LENS_R] : [50, 100, LENS_R]) {
+    ctx.beginPath(); ctx.arc(cx, cy, m * k, 0, Math.PI * 2); ctx.stroke();
+    if (!small) {
+      ctx.fillStyle = "rgba(242,239,233,.45)";
+      ctx.font = "500 10.5px Inter, sans-serif";
+      // Down and to the right, clear of the N and of most pins near you.
+      ctx.textAlign = "left"; ctx.textBaseline = "top";
+      ctx.fillText(`${m} m`, cx + m * k * 0.71 + 3, cy + m * k * 0.71 + 2);
+    }
+  }
+
+  // The camera's view, so the pins on screen can be found on the map.
+  if (small) {
+    const half = (FOV_LONG / 2) * RAD * 0.75;
+    ctx.fillStyle = "rgba(245,184,65,.16)";
+    ctx.beginPath(); ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, rad, -Math.PI / 2 - half, -Math.PI / 2 + half); ctx.closePath(); ctx.fill();
+  }
+
+  const [nx, ny] = place(0, LENS_R);
+  ctx.fillStyle = "rgba(242,239,233,.8)";
+  ctx.font = `600 ${small ? 9 : 11}px Inter, sans-serif`;
+  ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.fillText("N", cx + (nx - cx) * (small ? 0.82 : 1.08), cy + (ny - cy) * (small ? 0.82 : 1.08));
+
+  for (const c of L.clusters) {
+    const e = c.x - u.e, n = c.y - u.n;
+    if (Math.hypot(e, n) > LENS_R) continue;
+    const [x, y] = place(e, n);
+    const r = small ? 2.6 : clamp(5 + Math.sqrt(c.items.length) * 2.4, 6, 16);
+    drawDot(ctx, x, y, r, c, small);
+    if (!small) L.hits.push({ x, y, r: r + 10, c });
+    if (!small && L.sel === c) tag(ctx, x, y - r - 14, `${Math.round(Math.hypot(e, n))} m`);
+  }
+
+  // You, with GPS uncertainty as a halo.
+  if (!small && L.acc) {
+    ctx.fillStyle = "rgba(245,184,65,.10)";
+    ctx.beginPath(); ctx.arc(cx, cy, clamp(L.acc * k, 6, rad), 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.fillStyle = "#F5B841";
+  ctx.strokeStyle = "#0A0C10";
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(cx, cy, small ? 3.5 : 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+}
+
+function drawDot(ctx, x, y, r, c, plain) {
+  const sel = L.sel === c;
+  ctx.fillStyle = KIND_COLOR[c.kind];
+  ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+  if (plain) return;
+  if (c.severe || sel) {
+    ctx.lineWidth = sel ? 3.5 : 2;
+    ctx.strokeStyle = "#fff";
+    ctx.stroke();
+  }
+  if (c.items.length > 1 && r >= 8) {
+    ctx.fillStyle = "#0A0C10";
+    ctx.font = `600 ${Math.round(clamp(r * 0.95, 9, 16))}px Inter, sans-serif`;
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText(String(c.items.length), x, y + 0.5);
+  }
+}
+
+function tag(ctx, x, y, text) {
+  ctx.font = "600 12px Inter, sans-serif";
+  const w = ctx.measureText(text).width + 14;
+  ctx.fillStyle = "rgba(10,12,16,.82)";
+  ctx.beginPath(); ctx.roundRect(x - w / 2, y - 10, w, 20, 10); ctx.fill();
+  ctx.fillStyle = "#F2EFE9";
+  ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.fillText(text, x, y + 0.5);
+}
+
+$("lensCanvas").addEventListener("pointerdown", (e) => {
+  const box = e.currentTarget.getBoundingClientRect();
+  const x = e.clientX - box.left, y = e.clientY - box.top;
+  let best = null;
+  for (const h of L.hits) {
+    const d = Math.hypot(h.x - x, h.y - y);
+    if (d <= h.r && (!best || d < best.d)) best = { d, c: h.c };
+  }
+  L.sel = best ? best.c : null;
+  paintLensCard();
+});
+
+/* ---------- the card ---------- */
+function el(tag, cls, text) {
+  const n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (text != null) n.textContent = text;
+  return n;
+}
+
+function paintLensCard() {
+  const card = $("lensCard");
+  const msg = (text, retry) => {
+    const kids = [el("p", "msg", text)];
+    if (retry) {
+      const b = el("button", "btn btn-ghost btn-sm", "Try again");
+      b.addEventListener("click", () => { L.retry = false; L.error = null; L.origin = null; if (L.pos) fetchCrashes(L.pos); });
+      kids.push(b);
+    }
+    card.replaceChildren(...kids);
+  };
+
+  if (L.error && !L.data) return msg(L.error, L.retry);
+  if (!L.pos) return msg("Finding you…");
+  if (!L.data) return msg("Loading crash records…");
+  if (L.sel) return paintCrashDetail(card);
+
+  const year = L.data.since.slice(0, 4);
+  const near = L.data.crashes.filter((c) => meters(L.pos, c) <= LENS_R);
+  const stats = el("div", "stats");
+  for (const [n, label] of [
+    [near.filter((c) => c.kind === "ped").length, "Pedestrians struck"],
+    [near.filter((c) => c.kind === "bike").length, "Cyclists struck"],
+    [near.filter((c) => c.sev === "fatal" || c.sev === "serious").length, "Killed or seriously hurt"],
+  ]) {
+    const s = el("div", "stat");
+    s.append(el("b", null, String(n)), el("span", null, label));
+    stats.append(s);
+  }
+
+  const legend = el("div", "legend");
+  for (const [kind, label] of [["ped", "Pedestrian"], ["bike", "Cyclist"], ["car", "Vehicles"]]) {
+    const item = el("span", null, label);
+    const dot = el("i");
+    dot.style.background = KIND_COLOR[kind];
+    item.prepend(dot);
+    legend.append(item);
+  }
+  const sev = el("span", null, "Killed or seriously hurt");
+  sev.prepend(el("i", "sev"));
+  legend.append(sev);
+
+  const tip =
+    L.acc > 35 ? `GPS is within ${Math.round(L.acc)} m here, so pins are approximate.`
+    : L.data.truncated ? "Showing the most recent 2,000 crashes nearby."
+    : L.mode === "ar" ? "Tap a pin for details. Lay the phone flat for a map."
+    : stream ? "Hold your phone up to see these around you."
+    : "Tap a dot for details.";
+  const toggle = el("button", "toggle", L.filter === "hurt" ? "Show all crashes" : "Only people hurt");
+  toggle.addEventListener("click", () => { L.filter = L.filter === "hurt" ? "all" : "hurt"; cluster(); paintLensCard(); });
+  const row = el("div", "lens-row");
+  row.append(el("span", "tip", tip), toggle);
+
+  card.replaceChildren(
+    el("span", "eyebrow", `Within ${LENS_R} m · since ${year}`),
+    stats, legend, row
+  );
+}
+
+function paintCrashDetail(card) {
+  const c = L.sel;
+  const u = toLocal(L.origin, L.pos);
+  const n = c.items.length;
+  const dist = Math.round(Math.hypot(c.x - u.e, c.y - u.n));
+  const at = c.items.find((i) => i.at)?.at;
+
+  const list = el("ul", "crash-list");
+  for (const i of c.items.slice(0, 4)) {
+    const li = el("li", null, `${fmtDay(i.t)} · ${KIND_LABEL[i.kind]} · ${SEV_LABEL[i.sev]}`);
+    const k = el("i", "k");
+    k.style.background = KIND_COLOR[i.kind];
+    li.prepend(k);
+    const why = [i.cause, i.light].filter(Boolean).join(" · ");
+    if (why) li.append(el("span", null, why));
+    list.append(li);
+  }
+  if (n > 4) list.append(el("li", null, `and ${n - 4} more since ${L.data.since.slice(0, 4)}`));
+
+  const snap = el("button", "btn btn-primary btn-sm", "Snap this corner");
+  snap.addEventListener("click", () => go("s-home"));
+  const back = el("button", "btn btn-ghost btn-sm", "Back");
+  back.addEventListener("click", () => { L.sel = null; paintLensCard(); });
+  const btns = el("div", "btn-row");
+  btns.append(snap, back);
+
+  card.replaceChildren(
+    el("h3", null, `${n} crash${n === 1 ? "" : "es"} here`),
+    el("p", "sub", [`${dist} m away`, at && `near ${at}`].filter(Boolean).join(" · ")),
+    list, btns
+  );
+}
+
+function fmtDay(t) {
+  const d = new Date(t + "T12:00:00");
+  return isNaN(d) ? t : d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
 }
 
 /* ===================== about: service status ===================== */
@@ -1003,7 +1584,7 @@ async function paintStatus() {
 /* ===================== boot ===================== */
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) closeCamera();
-  else if (current === "s-home" && !stream) openCamera();
+  else if (LIVE.has(current) && !stream) openCamera();
 });
 window.addEventListener("pagehide", closeCamera);
 
